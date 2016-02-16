@@ -60,7 +60,7 @@ describe('all', function () {
     });
 
     it('stream', async function () {
-        const file = 'test/google.png';
+        var file = 'test/google.png';
         var request = WebRequest.create('https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png');
         var w = fs.createWriteStream(file);
         request.pipe(w);

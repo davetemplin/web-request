@@ -8,7 +8,7 @@ It wraps the popular [request](https://www.npmjs.com/package/request) package, e
 
 Fetch web-page content as a string...
 ```js
-import {WebRequest} from 'web-request';
+import * as WebRequest from 'web-request';
 var result = await WebRequest.get('http://www.google.com/');
 console.log(result.statusCode);
 console.log(result.content);
@@ -16,7 +16,7 @@ console.log(result.content);
 
 Fetch json data...
 ```js
-import {WebRequest} from 'web-request';
+import * as WebRequest from 'web-request';
 var url = 'http://query.yahooapis.com/v1/public/yql?q=select+*+from+yahoo.finance.quotes+where+symbol+IN+(%22YHOO%22,%22AAPL%22)&format=json&env=http://datatables.org/alltables.env';
 var result = await WebRequest.json<any>(url);
 for (var quote of result.query.results.quote)
@@ -25,7 +25,7 @@ for (var quote of result.query.results.quote)
 
 Fetch json data with a strongly typed result...
 ```js
-import {WebRequest} from 'web-request';
+import * as WebRequest from 'web-request';
 interface QuoteResult {
     query: {
         results: {
@@ -64,7 +64,7 @@ Make sure you're running Node v4 and TypeScript 1.7 or higher...
 ```
 $ node -v
 v4.2.6
-$ npm install -g typescript
+$ npm install -g typescript tsd
 $ tsc -v
 Version 1.7.5
 ```
@@ -74,19 +74,25 @@ Install the *web-request* package...
 $ npm install web-request
 ```
 
+Install required typings definitions for the Node.js API...
+```
+$ tsd install node --save
+```
+
 Write some code...
 ```js
-import {WebRequest} from 'web-request';
-var result = await WebRequest.get('http://www.google.com/');
-console.log(result.content);
+import * as WebRequest from 'web-request';
+(async function () {
+    var result = await WebRequest.get('http://www.google.com/');
+    console.log(result.content);
+})();
 ```
 
 Save the above to a file (index.ts), build and run it!
 ```
-$ tsc index.ts --target es6 --module commonjs
+$ tsc index.ts typings/tsd.d.ts --target es6 --module commonjs
 $ node index.js
-YHOO 26.90 low=26.72 high=27.32 vol=13011853
-AAPL 93.77 low=93.01 high=94.50 vol=40351381
+<!doctype html><html ...
 ```
 
 ## API Documentation

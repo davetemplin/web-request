@@ -4,7 +4,7 @@
 import * as http from 'http';
 import * as stream from 'stream';
 import * as url from 'url';
-import * as FormData from 'form-data';
+//import * as FormData from 'form-data';
 var request = require('request');
 
 export var throwResponseError = false;
@@ -137,7 +137,7 @@ export interface Request<T> extends stream.Stream {
     setHeader(name: string, value: string, clobber?: boolean): Request<T>;
     setHeaders(headers: Headers): Request<T>;
     qs(q: Object, clobber?: boolean): Request<T>;
-    form(): FormData.FormData;
+    form(): any; //FormData.FormData;
     form(form: any): Request<T>;
     multipart(multipart: RequestPart[]): Request<T>;
     json(val: any): Request<T>;
