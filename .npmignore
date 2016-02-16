@@ -1,0 +1,8 @@
+index.ts
+*.js.map
+main.*
+tsconfig.json
+tsd.json
+test
+typings
+.vscode
