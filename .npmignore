@@ -1,8 +1,8 @@
 index.ts
-*.js.map
 main.*
+test.*
 tsconfig.json
 tsd.json
-test
+*.js.map
 typings
 .vscode

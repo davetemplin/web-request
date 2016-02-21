@@ -2,6 +2,7 @@
 // Written by: Dave Templin <https://github.com/davetemplin/>
 
 import * as fs from 'fs';
+import * as stream from 'stream';
 import * as WebRequest from './index';
 
 (async function () {

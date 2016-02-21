@@ -4,24 +4,23 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import {assert} from 'chai';
-import * as WebRequest from '../index';
+import * as WebRequest from './index';
 
 describe('all', function () {
     
     it('get', async function () {
         var response = await WebRequest.get('http://www.google.com/');
-        assert(response.contentType === 'text/html'); //text/html
-        assert(response.charset === 'ISO-8859-1');
-        assert(response.statusCode === 200);
-        assert(response.statusMessage === 'OK');
-        assert(response.method === 'GET');
-        assert(response.headers['content-type'] === 'text/html; charset=ISO-8859-1');        
-        assert(response.uri.protocol === 'http:');    
-        assert(response.uri.port === 80);    
-        assert(response.uri.host === 'www.google.com');    
-        assert(response.uri.path === '/');    
-        assert(response.contentLength > 1000);
-        assert(response.content.indexOf('<!doctype html>') === 0);
+        assert(response.contentType === 'text/html', 'contentType');
+        assert(response.charset === 'ISO-8859-1', 'charset');
+        assert(response.statusCode === 200, 'statusCode');
+        assert(response.statusMessage === 'OK', 'statusMessage');
+        assert(response.method === 'GET', 'method');
+        assert(response.headers['content-type'] === 'text/html; charset=ISO-8859-1', 'headers');        
+        assert(response.uri.protocol === 'http:', 'uri.protocol');
+        assert(response.uri.host === 'www.google.com', 'uri.host');    
+        assert(response.uri.path === '/', 'uri.path');    
+        assert(response.contentLength > 1000, 'contentLength');
+        assert(response.content.indexOf('<!doctype html>') === 0, 'content');
     });
 
     it('404', async function () {
@@ -31,8 +30,8 @@ describe('all', function () {
 
     it('json1', async function () {
         var result = await WebRequest.json<any>('http://query.yahooapis.com/v1/public/yql?q=select+*+from+yahoo.finance.quotes+where+symbol+IN+(%22YHOO%22,%22AAPL%22)&format=json&env=http://datatables.org/alltables.env');
-        assert(result.query.results.quote[0].Symbol === 'YHOO');
-        assert(result.query.results.quote[1].Symbol === 'AAPL');
+        assert(result.query.results.quote[0].Symbol === 'YHOO', 'YHOO');
+        assert(result.query.results.quote[1].Symbol === 'AAPL', 'AAPL');
     });
     
     it('json2', async function () {
@@ -50,26 +49,25 @@ describe('all', function () {
             }
         }    
         var result = await WebRequest.json<QuoteResult>('http://query.yahooapis.com/v1/public/yql?q=select+*+from+yahoo.finance.quotes+where+symbol+IN+(%22YHOO%22,%22AAPL%22)&format=json&env=http://datatables.org/alltables.env');
-        assert(result.query.results.quote[0].Symbol === 'YHOO');
-        assert(result.query.results.quote[1].Symbol === 'AAPL');
+        assert(result.query.results.quote[0].Symbol === 'YHOO', 'YHOO');
+        assert(result.query.results.quote[1].Symbol === 'AAPL', 'AAPL');
     });                
     
     it('cookies', async function () {
         var response = await WebRequest.get('http://www.google.com/', {jar: true});
-        assert(response.cookies.length > 0);
+        assert(response.cookies.length > 0, response.cookies.length.toString() + ' cookies');
     });
 
     it('stream', async function () {
-        var file = 'test/google.png';
-        var request = WebRequest.create('https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png');
+        var file = 'google.png';
+        var request = WebRequest.stream('https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png');        
         var w = fs.createWriteStream(file);
         request.pipe(w);
-        await Promise.all([
-            request.response,
-            new Promise(resolve => w.on('finish', () => resolve()))    
-        ]);        
+        var response = await request.response;
+        await new Promise(resolve => w.on('finish', () => resolve()));
         var stat = fs.statSync(file);
-        assert(stat.size > 10000);
+        assert(stat.size > 10000, 'file-size');
+        assert(response.content === null, 'null content');
         fs.unlinkSync(file);
     });
 
@@ -80,8 +78,8 @@ describe('all', function () {
             assert(false, 'Expected exception did not occur');
         }
         catch (err) {
-            assert(err instanceof WebRequest.ResponseError, 'err not an instace of ResponseError');
-            assert((<WebRequest.ResponseError<string>>err).response.statusCode === 404);
+            assert(err instanceof WebRequest.ResponseError, 'instanceof');
+            assert((<WebRequest.ResponseError<string>>err).response.statusCode === 404, 'statusCode');
         }        
     });
 });

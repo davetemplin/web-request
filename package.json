@@ -13,11 +13,15 @@
   "keywords": [
     "async",
     "await",
+    "async/await",
+    "async-await",
     "typescript",
     "promise",
     "request",
     "web",
-    "http"
+    "http",
+    "stream",
+    "pipe"
   ],
   "author": {
     "name": "Dave Templin",

@@ -1,31 +1,27 @@
 # web-request
 > Simplifies making web requests with TypeScript async/await
 
-This package makes it easier to perform web requests using [TypeScript](http://www.typescriptlang.org/) and [**async-await**](https://blogs.msdn.microsoft.com/typescript/2015/11/03/what-about-asyncawait/).
-It wraps the popular [request](https://www.npmjs.com/package/request) package, extending it with an interface that facilitates async-await and strong-typing.
+This package makes it easier to perform web requests using [TypeScript](http://www.typescriptlang.org/) and [**async/await**](https://blogs.msdn.microsoft.com/typescript/2015/11/03/what-about-asyncawait/).
+It wraps the popular [request](https://www.npmjs.com/package/request) package, extending it with an interface that facilitates async/await and strong-typing.
 
 ## Examples
 
-Fetch web-page content as a string...
+Get web-page content as a string...
 ```js
-import * as WebRequest from 'web-request';
 var result = await WebRequest.get('http://www.google.com/');
-console.log(result.statusCode);
 console.log(result.content);
 ```
 
-Fetch json data...
+Get JSON data...
 ```js
-import * as WebRequest from 'web-request';
 var url = 'http://query.yahooapis.com/v1/public/yql?q=select+*+from+yahoo.finance.quotes+where+symbol+IN+(%22YHOO%22,%22AAPL%22)&format=json&env=http://datatables.org/alltables.env';
-var result = await WebRequest.json<any>(url);
-for (var quote of result.query.results.quote)
+var data = await WebRequest.json<any>(url);
+for (var quote of data.query.results.quote)
     console.log(quote.Symbol, quote.Bid, 'low='+quote.DaysLow, 'high='+quote.DaysHigh, 'vol='+quote.Volume);  
 ```
 
-Fetch json data with a strongly typed result...
+Get JSON data with a strongly typed result...
 ```js
-import * as WebRequest from 'web-request';
 interface QuoteResult {
     query: {
         results: {
@@ -40,8 +36,8 @@ interface QuoteResult {
     }
 }    
 var url = 'http://query.yahooapis.com/v1/public/yql?q=select+*+from+yahoo.finance.quotes+where+symbol+IN+(%22YHOO%22,%22AAPL%22)&format=json&env=http://datatables.org/alltables.env';
-var result = await WebRequest.json<QuoteResult>(url);
-for (var quote of result.query.results.quote)
+var data = await WebRequest.json<QuoteResult>(url);
+for (var quote of data.query.results.quote)
     console.log(quote.Symbol, quote.Bid, 'low='+quote.DaysLow, 'high='+quote.DaysHigh, 'vol='+quote.Volume);  
 ```
 
@@ -69,14 +65,10 @@ $ tsc -v
 Version 1.7.5
 ```
 
-Install the *web-request* package...
+Install the *web-request* package and the typings definitions for Node.js...
 ```
 $ npm install web-request
-```
-
-Install required typings definitions for the Node.js API...
-```
-$ tsd install node --save
+$ tsd install node
 ```
 
 Write some code...
@@ -90,12 +82,15 @@ import * as WebRequest from 'web-request';
 
 Save the above to a file (index.ts), build and run it!
 ```
-$ tsc index.ts typings/tsd.d.ts --target es6 --module commonjs
+$ tsc index.ts typings/node/node.d.ts --target es6 --module commonjs
 $ node index.js
 <!doctype html><html ...
 ```
 
-## API Documentation
+## Notes
+* Setting **WebRequest.throwResponseError=true** will cause any response with a 400 or 500 level status to throw an exception.
+
+## Interface
 
 ```js
 async function get(uri: string, options?: RequestOptions): Promise<Response<string>>;
@@ -106,6 +101,7 @@ async function head(uri: string, options?: RequestOptions): Promise<Response<voi
 async function del(uri: string, options?: RequestOptions): Promise<Response<string>>;
 async function json<T>(uri: string, options?: RequestOptions): Promise<T>;
 async function create<T>(uri: string, options?: RequestOptions, content?: any): Promise<Response<T>>;
+async function stream(uri: string, options?: RequestOptions, content?: any): Promise<Response<void>>;
 function defaults(options: RequestOptions): void;
 var throwResponseError = false;
 
@@ -138,22 +134,20 @@ Note the following interfaces are as defined by *request*...
 * [RequestOptions](https://www.npmjs.com/package/request#requestoptions-callback)
 * [http.IncomingMessage](https://nodejs.org/api/http.html#http_http_incomingmessage)
 
-## Notes
-* Setting **WebRequest.throwResponseError=true** will cause any response with a 400 or 500 level status to throw an exception.
-
 ## More Examples
 
-Setting defaults for all requests is supported...
+Setting defaults that apply for all requests is supported...
 ```js
-WebRequest.defaults({
-    'proxy': 'http://localproxy.com',
-    'baseUrl': 'https://example.com/api/'
-});
+WebRequest.defaults({'baseUrl': 'https://example.com/'});
+// now we can make requests without having to specify the root every time...
+var orders = await WebRequest.json<Order[]>('/customers/123/orders');
+await WebRequest.post('/customers/321/orders', null, orders);
+await WebRequest.del('/customers/123');
 ```
 
-Adapted [HTTP Authentication](https://www.npmjs.com/package/request#http-authentication) example...
+To make a request that requires authentication...
 ```js
-await WebRequest.get('http://some.server.com/', {
+await WebRequest.get('https://example.com/', {
   auth: {
     user: 'username',
     pass: 'password',
@@ -161,9 +155,9 @@ await WebRequest.get('http://some.server.com/', {
   }});
 ```
 
-Adapted [Custom HTTP Headers](https://www.npmjs.com/package/request#custom-http-headers) example...
+To make a request with custom headers...
 ```js
-await WebRequest.get('https://api.github.com/repos/request/request', {headers: {'User-Agent': 'request'}});
+await WebRequest.get('https://example.com', {headers: {'User-Agent': 'request'}});
 ```
 
 To enable cookies, set jar to true or specify a custom cookie jar...
@@ -172,71 +166,26 @@ var response = await WebRequest.get('https://www.google.com/', {jar: true});
 console.log(response.cookies);
 ```
 
-[Streaming](https://www.npmjs.com/package/request#streaming) is possible using create...
+Use the **stream** method to request a large resource efficiently with negligible memory impact...
 ```js
-var request = WebRequest.create('http://img15.hostingpics.net/pics/944021EarthHighRes.png'); // 4.3Mb
+var request = WebRequest.stream('http://img15.hostingpics.net/pics/944021EarthHighRes.png'); // 4.3Mb
 var w = fs.createWriteStream('earth.png');
-request.pipe(w);
-await Promise.all([
-    request.response,
-    new Promise(resolve => w.on('finish', () => resolve()))    
-]);
+request.pipe(w); // pipe content directly to a file
+var response = await request.response; // wait for web-request to complete
+await new Promise(resolve => w.on('finish', () => resolve())); // wait for file-write to complete
 ```
 
+Stream a file up to a server... 
 ```js
-var request = WebRequest.create('http://mysite.com/obj.json', {method:'put'});
+var request = WebRequest.stream('http://example.com/data.json', {method:'post'});
 fs.createReadStream('file.json').pipe(request);
 await request.response;
 ```
 
+Stream a file from one server to another...
 ```js
-var request1 = WebRequest.create('http://google.com/img.png', {method:'get'});
-var request2 = WebRequest.create('http://mysite.com/img.png', {method:'put'});
+var request1 = WebRequest.stream('http://test.com/earth.png', {method:'get'});
+var request2 = WebRequest.stream('http://example.com/earth.png', {method:'post'});
 request1.pipe(request2);
 await Promise.all([request1.response, request2.response]);
-```
-
-Accessing chunked data...
-```js
-var request = WebRequest.create('http://www.google.com', {method: 'GET', gzip: true}); 
-
-// decompressed data as it is received
-request.on('data', data =>     
-    console.log('decoded chunk: ' + data)); 
-
-// unmodified http.IncomingMessage object
-request.on('response', response =>     
-    response.on('data', (data:any) =>          
-        console.log('received ' + data.length + ' bytes of compressed data'))); // compressed data as it is received
-
-
-var response = await request.response;
-
-// body is the decompressed response body 
-console.log('server encoded the data as: ' + (response.headers['content-encoding'] || 'identity'));
-console.log('the decoded data is: ' + response.content);
-```
-
-Adapted [multipart](https://www.npmjs.com/package/request#multipartrelated) example...
-```js
-var rand = Math.floor(Math.random()*100000000).toString();
-var url = 'http://mikeal.iriscouch.com/testjs/' + rand;
-var response = await WebRequest.create(url, {
-    method: 'PUT', 
-    multipart: [
-        { 
-            'content-type': 'application/json', 
-            body: JSON.stringify({foo: 'bar', _attachments: {'message.txt': {follows: true, length: 18, 'content_type': 'text/plain' }}})
-        },
-        {
-            body: 'I am an attachment' 
-        }
-    ]}).response;
-if (response.statusCode == 201) {
-    console.log('document saved as: http://mikeal.iriscouch.com/testjs/'+ rand);
-}
-else {
-    console.log('error: ' + response.statusCode);
-    console.log(response.content);
-}
 ```

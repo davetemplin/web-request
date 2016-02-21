@@ -3,7 +3,7 @@
 
 import * as http from 'http';
 import * as stream from 'stream';
-import * as url from 'url';
+import {Url} from 'url';
 //import * as FormData from 'form-data';
 var request = require('request');
 
@@ -19,11 +19,9 @@ export async function json<T>(uri: string, options?: RequestOptions): Promise<T>
 
 
 export function create<T>(uri: string, options?: RequestOptions, content?: any): Request<T> {
-    options = Object.assign({}, options, {url: uri});
-    
+    options = Object.assign({}, options, {uri: uri});    
     if (options.jar === true)
-        options.jar = request.jar();
-    
+        options.jar = request.jar();    
     if (content !== undefined)
         options.body = content;
        
@@ -46,6 +44,29 @@ export function create<T>(uri: string, options?: RequestOptions, content?: any):
     instance.options = options;
     instance.response = promise;
     
+    return instance;
+}
+
+export function stream(uri: string, options?: RequestOptions, content?: any): Request<void> {
+    options = Object.assign({}, options, {uri: uri});    
+    if (options.jar === true)
+        options.jar = request.jar();
+    if (content !== undefined)
+        options.body = content;
+    
+    var instance: Request<void> = request(options);
+    instance.options = options;
+    instance.response = new Promise<Response<void>>((resolve, reject) =>
+        instance
+            .on('complete', message => {
+                var response = new Response<void>(instance, message, null);
+                if (message.statusCode < 400 || !throwResponseError)
+                    resolve(response);
+                else
+                    reject(new ResponseError<void>(response));
+            })
+            .on('error', err => reject(new RequestError(err, instance))));
+        
     return instance;
 }
 
@@ -76,9 +97,9 @@ export interface Cookie extends Array<CookieValue> {
 }
 
 export interface CookieJar {
-    setCookie(cookie: Cookie, uri: string | url.Url, options?: any): void
-    getCookieString(uri: string | url.Url): string
-    getCookies(uri: string | url.Url): Cookie[]
+    setCookie(cookie: Cookie, uri: string | Url, options?: any): void
+    getCookieString(uri: string | Url): string
+    getCookies(uri: string | Url): Cookie[]
 }
 
 export interface CookieValue {
@@ -129,7 +150,10 @@ export interface OAuthOptions {
 }
 
 export interface Request<T> extends stream.Stream {
+    headers: Headers;
+    method: string;
     readable: boolean;
+    uri: Url;
     writable: boolean;
 
     getAgent(): http.Agent;
@@ -150,7 +174,7 @@ export interface Request<T> extends stream.Stream {
     on(event: 'request', listener: (req: http.ClientRequest) => void): Request<T>;
     on(event: 'response', listener: (resp: http.IncomingMessage) => void): Request<T>;
     on(event: 'data', listener: (data: Buffer | string) => void): Request<T>;
-    on(event: 'error', listener: (e: Error) => void): Request<T>;
+    on(event: 'error', listener: (err: Error) => void): Request<T>;
     on(event: 'complete', listener: (resp: http.IncomingMessage, body?: string | Buffer) => void): Request<T>;
 
     write(buffer: Buffer, cb?: Function): boolean;
@@ -208,13 +232,16 @@ export interface RequestOptions {
     ca?: Buffer;
     har?: HttpArchiveRequest;
     useQuerystring?: boolean;
-    url?: string; // extension
+    uri?: string; // extension
 }
 
 export class RequestError<T> extends Error {
-    constructor(err: Error, public request: Request<T>) {
+    request: Request<T>;
+    innerError: Error;
+    constructor(err: Error, request: Request<T>) {
         super(err.message);
         this.request = request;
+        this.innerError = err;
     }
 }
 
@@ -242,7 +269,7 @@ export class Response<T> {
     get cookies(): Cookie[] {
         if (typeof this.request.options.jar === 'object') {
             var jar = <CookieJar>this.request.options.jar;
-            return jar.getCookies(this.request.options.url); 
+            return jar.getCookies(this.request.options.uri); 
         }
     }
     get headers(): Headers { return this.message.headers; }
@@ -252,28 +279,17 @@ export class Response<T> {
     get server(): string { return this.message.headers['server']; }
     get statusCode(): number { return this.message.statusCode; }
     get statusMessage(): string { return this.message.statusMessage; }        
-    get uri(): Uri { return (<any>this.message).request.uri; }
+    get uri(): Url { return (<any>this.message).request.uri; }
 }
 
 export class ResponseError<T> extends Error {
-    constructor(public response: Response<T>) {
+    response: Response<T>;
+    statusCode: number;
+    constructor(response: Response<T>) {
         super(response.statusMessage);
         this.response = response;
+        this.statusCode = response.statusCode;
     }
-}
-
-export interface Uri {
-    auth: string;
-    hash: string;
-    host: string;
-    hostname: string;
-    href: string;
-    path: string;
-    pathname: string;
-    port: number;
-    protocol: string;
-    query: string;
-    search: string;
 }
 
 function parseKeyValue(text: string): {key: string; value: string} {
