@@ -24,8 +24,19 @@ describe('all', function () {
     });
 
     it('404', async function () {
-        var response = await WebRequest.get('http://www.google.com/yahoo');
+        var response = await WebRequest.get('http://www.google.com/invalid');
         assert(response.statusCode === 404);
+    });
+
+    it('error', async function () {
+        try {
+            var response = await WebRequest.get('');
+            assert(false, 'Expected exception did not occur');    
+        }        
+        catch (err) {
+            assert(err instanceof WebRequest.RequestError, 'instanceof');
+            assert(err.message === 'options.uri is a required argument', 'message');
+        }
     });
 
     it('json1', async function () {
