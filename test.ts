@@ -82,10 +82,9 @@ describe('all', function () {
         fs.unlinkSync(file);
     });
 
-    it('throw', async function () {
-        WebRequest.throwResponseError = true;
+    it('throwResponseError', async function () {
         try {
-            await WebRequest.get('http://www.google.com/yahoo');
+            await WebRequest.get('http://xyzzy.com/123', {throwResponseError: true});
             assert(false, 'Expected exception did not occur');
         }
         catch (err) {

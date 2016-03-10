@@ -87,8 +87,18 @@ $ node index.js
 <!doctype html><html ...
 ```
 
-## Notes
-* Setting **WebRequest.throwResponseError=true** will cause any response with a 400 or 500 level status to throw an exception.
+## Response Errors as Exceptions
+The **throwResponseError** option will cause any response with a 400 or 500 level status to throw an exception. This option is disabled by default.
+
+Throw an exception for a specific request.
+```js
+await WebRequest.get('http://xyzzy.com/123', {throwResponseError: true});
+```
+
+Throw an exception for any request that results in an error response.
+```js
+WebRequest.defaults({throwResponseErrors: true});
+```
 
 ## Interface
 
@@ -103,7 +113,6 @@ async function json<T>(uri: string, options?: RequestOptions): Promise<T>;
 async function create<T>(uri: string, options?: RequestOptions, content?: any): Promise<Response<T>>;
 async function stream(uri: string, options?: RequestOptions, content?: any): Promise<Response<void>>;
 function defaults(options: RequestOptions): void;
-var throwResponseError = false;
 
 interface Request<T> extends request.Request {
     options: RequestOptions;
@@ -138,7 +147,7 @@ Note the following interfaces are as defined by *request*...
 
 Setting defaults that apply for all requests is supported...
 ```js
-WebRequest.defaults({'baseUrl': 'https://example.com/'});
+WebRequest.defaults({baseUrl: 'https://example.com/'});
 // now we can make requests without having to specify the root every time...
 var orders = await WebRequest.json<Order[]>('/customers/123/orders');
 await WebRequest.post('/customers/321/orders', null, orders);

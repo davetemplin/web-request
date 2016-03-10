@@ -17,20 +17,22 @@ export async function head(uri: string, options?: RequestOptions): Promise<Respo
 export async function del(uri: string, options?: RequestOptions): Promise<Response<string>> { return await create<string>(uri, Object.assign({}, options, {method: 'DELETE'})).response; }
 export async function json<T>(uri: string, options?: RequestOptions): Promise<T> { return (await create<T>(uri, Object.assign({}, options, {json: true})).response).content; }
 
-
 export function create<T>(uri: string, options?: RequestOptions, content?: any): Request<T> {
     options = Object.assign({}, options, {uri: uri});    
     if (options.jar === true)
         options.jar = request.jar();    
     if (content !== undefined)
         options.body = content;
+    var throwEnabled = throwResponseError;
+    if (options.throwResponseError !== undefined)
+        throwEnabled = options.throwResponseError;
        
     var instance: Request<T>; 
     var promise = new Promise<Response<T>>((resolve, reject) => {
         instance = request(options, (err: Error, message: http.IncomingMessage, body: T) => {
             if (!err) {
                 var response = new Response<T>(instance, message, body);
-                if (message.statusCode < 400 || !throwResponseError)
+                if (message.statusCode < 400 || !throwEnabled)
                     resolve(response);
                 else
                     reject(new ResponseError(response));
@@ -71,6 +73,8 @@ export function stream(uri: string, options?: RequestOptions, content?: any): Re
 }
 
 export function defaults(options: RequestOptions): void {
+    if (options.throwResponseError !== undefined)
+        throwResponseError = options.throwResponseError;
     request.defaults(options);
 }
 
@@ -158,24 +162,24 @@ export interface Request<T> extends stream.Stream {
 
     getAgent(): http.Agent;
     pipeDest(dest: any): void;
-    setHeader(name: string, value: string, clobber?: boolean): Request<T>;
-    setHeaders(headers: Headers): Request<T>;
-    qs(q: Object, clobber?: boolean): Request<T>;
+    setHeader(name: string, value: string, clobber?: boolean): this;
+    setHeaders(headers: Headers): this;
+    qs(q: Object, clobber?: boolean): this;
     form(): any; //FormData.FormData;
-    form(form: any): Request<T>;
-    multipart(multipart: RequestPart[]): Request<T>;
-    json(val: any): Request<T>;
-    aws(opts: AWSOptions, now?: boolean): Request<T>;
-    auth(username: string, password: string, sendInmediately?: boolean, bearer?: string): Request<T>;
-    oauth(oauth: OAuthOptions): Request<T>;
-    jar(jar: CookieJar): Request<T>;
+    form(form: any): this;
+    multipart(multipart: RequestPart[]): this;
+    json(val: any): this;
+    aws(opts: AWSOptions, now?: boolean): this;
+    auth(username: string, password: string, sendInmediately?: boolean, bearer?: string): this;
+    oauth(oauth: OAuthOptions): this;
+    jar(jar: CookieJar): this;
 
-    on(event: string, listener: Function): Request<T>;
-    on(event: 'request', listener: (req: http.ClientRequest) => void): Request<T>;
-    on(event: 'response', listener: (resp: http.IncomingMessage) => void): Request<T>;
-    on(event: 'data', listener: (data: Buffer | string) => void): Request<T>;
-    on(event: 'error', listener: (err: Error) => void): Request<T>;
-    on(event: 'complete', listener: (resp: http.IncomingMessage, body?: string | Buffer) => void): Request<T>;
+    on(event: string, listener: Function): this;
+    on(event: 'request', listener: (req: http.ClientRequest) => void): this;
+    on(event: 'response', listener: (resp: http.IncomingMessage) => void): this;
+    on(event: 'data', listener: (data: Buffer | string) => void): this;
+    on(event: 'error', listener: (err: Error) => void): this;
+    on(event: 'complete', listener: (resp: http.IncomingMessage, body?: string | Buffer) => void): this;
 
     write(buffer: Buffer, cb?: Function): boolean;
     write(str: string, cb?: Function): boolean;
@@ -233,6 +237,7 @@ export interface RequestOptions {
     har?: HttpArchiveRequest;
     useQuerystring?: boolean;
     uri?: string; // extension
+    throwResponseError?: boolean; // extension
 }
 
 export class RequestError<T> extends Error {
