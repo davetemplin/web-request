@@ -170,7 +170,7 @@ export interface Request<T> extends stream.Stream {
     multipart(multipart: RequestPart[]): this;
     json(val: any): this;
     aws(opts: AWSOptions, now?: boolean): this;
-    auth(username: string, password: string, sendInmediately?: boolean, bearer?: string): this;
+    auth(username: string, password: string, sendImmediately?: boolean, bearer?: string): this;
     oauth(oauth: OAuthOptions): this;
     jar(jar: CookieJar): this;
 
