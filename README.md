@@ -49,7 +49,7 @@ var orders = await WebRequest.json<Order[]>('http://www.example.com/customers/12
 for (var order of orders)
     order.status = "backorder";
 await WebRequest.post('http://www.example.com/customers/321/orders', null, orders);
-await WebRequest.del('http://www.example.com/customers/123');
+await WebRequest.delete('http://www.example.com/customers/123');
 // Flag order #98765 as shipped...
 await WebRequest.patch('http://www.example.com/customers/321/orders/98765', null, {status: "shipped"});
 ```
@@ -103,16 +103,17 @@ WebRequest.defaults({throwResponseErrors: true});
 ## Interface
 
 ```js
-async function get(uri: string, options?: RequestOptions): Promise<Response<string>>;
-async function post(uri: string, options?: RequestOptions, content?: any): Promise<Response<string>>;
-async function put(uri: string, options?: RequestOptions, content?: any): Promise<Response<string>>;
-async function patch(uri: string, options?: RequestOptions, content?: any): Promise<Response<string>>;
-async function head(uri: string, options?: RequestOptions): Promise<Response<void>>;
-async function del(uri: string, options?: RequestOptions): Promise<Response<string>>;
-async function json<T>(uri: string, options?: RequestOptions): Promise<T>;
-async function create<T>(uri: string, options?: RequestOptions, content?: any): Promise<Response<T>>;
-async function stream(uri: string, options?: RequestOptions, content?: any): Promise<Response<void>>;
+function get(uri: string, options?: RequestOptions): Promise<Response<string>>;
+function post(uri: string, options?: RequestOptions, content?: any): Promise<Response<string>>;
+function put(uri: string, options?: RequestOptions, content?: any): Promise<Response<string>>;
+function patch(uri: string, options?: RequestOptions, content?: any): Promise<Response<string>>;
+function head(uri: string, options?: RequestOptions): Promise<Response<void>>;
+function delete(uri: string, options?: RequestOptions): Promise<Response<string>>;
+function json<T>(uri: string, options?: RequestOptions): Promise<T>;
+function create<T>(uri: string, options?: RequestOptions, content?: any): Promise<Response<T>>;
+function stream(uri: string, options?: RequestOptions, content?: any): Promise<Response<void>>;
 function defaults(options: RequestOptions): void;
+function debug(value?: boolean): boolean;
 
 interface Request<T> extends request.Request {
     options: RequestOptions;
@@ -151,7 +152,7 @@ WebRequest.defaults({baseUrl: 'https://example.com/'});
 // now we can make requests without having to specify the root every time...
 var orders = await WebRequest.json<Order[]>('/customers/123/orders');
 await WebRequest.post('/customers/321/orders', null, orders);
-await WebRequest.del('/customers/123');
+await WebRequest.delete('/customers/123');
 ```
 
 To make a request that requires authentication...

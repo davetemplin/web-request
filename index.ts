@@ -16,6 +16,7 @@ export async function patch(uri: string, options?: RequestOptions, content?: any
 export async function head(uri: string, options?: RequestOptions): Promise<Response<void>> { return await create<void>(uri, Object.assign({}, options, {method: 'HEAD'})).response; }
 export async function del(uri: string, options?: RequestOptions): Promise<Response<string>> { return await create<string>(uri, Object.assign({}, options, {method: 'DELETE'})).response; }
 export async function json<T>(uri: string, options?: RequestOptions): Promise<T> { return (await create<T>(uri, Object.assign({}, options, {json: true})).response).content; }
+export {del as delete};
 
 export function create<T>(uri: string, options?: RequestOptions, content?: any): Request<T> {
     options = Object.assign({}, options, {uri: uri});    
@@ -76,6 +77,13 @@ export function defaults(options: RequestOptions): void {
     if (options.throwResponseError !== undefined)
         throwResponseError = options.throwResponseError;
     request.defaults(options);
+}
+
+export function debug(value?: boolean): boolean {
+    if (value === undefined)
+        return request.debug;
+    else
+        request.debug = value;
 }
 
 export interface AuthOptions {
