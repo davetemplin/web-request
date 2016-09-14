@@ -105,6 +105,7 @@ export interface Cookie extends Array<CookieValue> {
     str: string;
     expires: Date;
     path: string;
+    domain: string;
     toString(): string;
 }
 
