@@ -2,7 +2,7 @@
 // Written by: Dave Templin <https://github.com/davetemplin/>
 
 import * as http from 'http';
-import * as stream from 'stream';
+import * as _stream from 'stream';
 import {Url} from 'url';
 //import * as FormData from 'form-data';
 var request = require('request');
@@ -162,7 +162,7 @@ export interface OAuthOptions {
     verifier?: string;
 }
 
-export interface Request<T> extends stream.Stream {
+export interface Request<T> extends _stream.Stream {
     headers: Headers;
     method: string;
     readable: boolean;
