@@ -1,6 +1,6 @@
 {
   "name": "web-request",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Simplifies making web requests with TypeScript async/await",
   "main": "index.js",
   "scripts": {
