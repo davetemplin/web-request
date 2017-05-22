@@ -236,6 +236,7 @@ export interface RequestOptions {
     timeout?: number;
     proxy?: any;
     strictSSL?: boolean;
+    rejectUnauthorized?: boolean;
     gzip?: boolean;
     preambleCRLF?: boolean;
     postambleCRLF?: boolean;
@@ -262,7 +263,7 @@ export class RequestError<T> extends Error {
 export class Response<T> {
     request: Request<T>;
     message: http.IncomingMessage;
-    private body: T
+    private body: T;
     
     constructor(request: Request<T>, message: http.IncomingMessage, body: T) {
         this.request = request;
