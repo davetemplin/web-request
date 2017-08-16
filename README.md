@@ -68,7 +68,6 @@ Version 1.7.5
 Install the *web-request* package and the typings definitions for Node.js...
 ```
 $ npm install web-request
-$ tsd install node
 ```
 
 Write some code...
