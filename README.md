@@ -109,7 +109,7 @@ function patch(uri: string, options?: RequestOptions, content?: any): Promise<Re
 function head(uri: string, options?: RequestOptions): Promise<Response<void>>;
 function delete(uri: string, options?: RequestOptions): Promise<Response<string>>;
 function json<T>(uri: string, options?: RequestOptions): Promise<T>;
-function create<T>(uri: string, options?: RequestOptions, content?: any): Promise<Response<T>>;
+function create<T>(uri: string, options?: RequestOptions, content?: any): Promise<Request<T>>;
 function stream(uri: string, options?: RequestOptions, content?: any): Promise<Response<void>>;
 function defaults(options: RequestOptions): void;
 function debug(value?: boolean): boolean;
