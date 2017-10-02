@@ -6,7 +6,8 @@
     "preserveConstEnums": false,
     "sourceMap": true,
     "declaration": true,
-    "target": "es6"
+    "target": "es5",
+    "lib": ["es6", "es2015"]
   },
   "files": [
     "node_modules/@types/chai/index.d.ts",
