@@ -9,7 +9,11 @@
     "target": "es6"
   },
   "files": [
-    "typings/tsd.d.ts",
+    "node_modules/@types/chai/index.d.ts",
+    "node_modules/@types/form-data/index.d.ts",
+    "node_modules/@types/mocha/index.d.ts",
+    "node_modules/@types/node/index.d.ts",
+    "node_modules/@types/request/index.d.ts",
     "index.ts",
     "main.ts",
     "test.ts"

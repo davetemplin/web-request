@@ -270,16 +270,16 @@ export class Response<T> {
         this.body = body;
     }
     
-    get charset(): string { return parseContentType(this.message.headers['content-type']).charset; }
+    get charset(): string { return parseContentType(<string>this.message.headers['content-type']).charset; }
     get content(): T { 
         return <T>this.body; }  
     get contentLength(): number { 
         if ('content-length' in this.message.headers)
-            return parseInt(this.message.headers['content-length']);
+            return parseInt(<string>this.message.headers['content-length']);
         else if (typeof this.body === 'string')
             return (<any>this.body).length;
      }
-    get contentType(): string { return parseContentType(this.message.headers['content-type']).contentType; }
+    get contentType(): string { return parseContentType(<string>this.message.headers['content-type']).contentType; }
     get cookies(): Cookie[] {
         if (typeof this.request.options.jar === 'object') {
             var jar = <CookieJar>this.request.options.jar;
@@ -290,7 +290,7 @@ export class Response<T> {
     get httpVersion(): string { return this.message.httpVersion; }
     get lastModified(): Date { return new Date(this.message.headers['last-modified']); }    
     get method(): string { return this.message.method || (<any>this.message).request.method; }
-    get server(): string { return this.message.headers['server']; }
+    get server(): string { return <string>this.message.headers['server']; }
     get statusCode(): number { return this.message.statusCode; }
     get statusMessage(): string { return this.message.statusMessage; }        
     get uri(): Url { return (<any>this.message).request.uri; }
