@@ -96,7 +96,7 @@ await WebRequest.get('http://xyzzy.com/123', {throwResponseError: true});
 
 Throw an exception for any request that results in an error response.
 ```js
-WebRequest.defaults({throwResponseErrors: true});
+WebRequest.defaults({throwResponseError: true});
 ```
 
 ## Interface
