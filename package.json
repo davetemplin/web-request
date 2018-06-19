@@ -4,7 +4,8 @@
   "description": "Simplifies making web requests with TypeScript async/await",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
