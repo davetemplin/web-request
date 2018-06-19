@@ -248,6 +248,7 @@ export interface RequestOptions {
     useQuerystring?: boolean;
     uri?: string; // extension
     throwResponseError?: boolean; // extension
+    family?:number;
 }
 
 export class RequestError<T> extends Error {
