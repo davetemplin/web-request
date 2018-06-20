@@ -5,7 +5,7 @@
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "prepublish": "npm run build",
+    "prepublish": "npm run build",
     "test": "mocha",
     "build": "tsc"
   },
