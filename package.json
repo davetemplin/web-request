@@ -3,6 +3,7 @@
   "version": "1.0.8",
   "description": "Simplifies making web requests with TypeScript async/await",
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "prepublish": "npm run build",
     "test": "mocha",
@@ -10,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davetemplin/web-request.git"
+    "url": "git+https://github.com/mbharanya/web-request.git"
   },
   "keywords": [
     "async",
