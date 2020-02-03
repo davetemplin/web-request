@@ -43,7 +43,7 @@
     "mocha": "^2.3.4"
   },
   "dependencies": {
-    "@types/node": "^8.0.22",
+    "@types/node": "^13.7.0",
     "@types/request": "^2.0.1",
     "request": "^2.69.0"
   }
