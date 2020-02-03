@@ -2,8 +2,7 @@
   "name": "web-request",
   "version": "1.0.8",
   "description": "Simplifies making web requests with TypeScript async/await",
-  "main": "index.js",
-  "types": "index.ts",
+  "main": "dist/index.js",
   "scripts": {
     "prepublish": "npm run build",
     "test": "mocha",
