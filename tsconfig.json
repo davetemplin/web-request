@@ -6,17 +6,12 @@
     "preserveConstEnums": false,
     "sourceMap": true,
     "declaration": true,
-    "target": "es5",
-    "lib": ["es6", "es2015"]
+    "target": "es2018",
+    "lib": ["ES2018","esnext.asynciterable" ],
+    "outDir": "dist",
+    "rootDir": "./src",
   },
-  "files": [
-    "node_modules/@types/chai/index.d.ts",
-    "node_modules/@types/form-data/index.d.ts",
-    "node_modules/@types/mocha/index.d.ts",
-    "node_modules/@types/node/index.d.ts",
-    "node_modules/@types/request/index.d.ts",
-    "index.ts",
-    "main.ts",
-    "test.ts"
+  "include": [
+    "src/**/*"
   ]
 }
